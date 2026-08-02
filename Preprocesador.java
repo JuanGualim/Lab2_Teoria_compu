@@ -1,17 +1,42 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Preprocesador {
 
     /**
-     * Agrega el operador de concatenación (.)
-     * donde sea necesario.
+     * Preprocesa una expresión regular.
      *
-     * Ejemplos:
-     *
-     * ab      -> a.b
-     * (a|b)c  -> (a|b).c
-     * a(b|c)  -> a.(b|c)
-     * a*b     -> a*.b
+     * Actualmente:
+     * - Inserta concatenaciones explícitas.
+     * - Registra todos los pasos.
      */
-    public static String insertarConcatenacion(String expresion) {
+    public static ResultadoPreprocesamiento preprocesar(String expresion) {
+
+        List<String> pasos = new ArrayList<>();
+
+        pasos.add("Expresión original:");
+        pasos.add(expresion);
+        pasos.add("");
+
+        String procesada = insertarConcatenacion(expresion, pasos);
+
+        pasos.add("");
+        pasos.add("Expresión después del preprocesamiento:");
+        pasos.add(procesada);
+
+        return new ResultadoPreprocesamiento(
+                expresion,
+                procesada,
+                pasos
+        );
+
+    }
+
+    /**
+     * Inserta el operador .
+     */
+    private static String insertarConcatenacion(String expresion,
+                                                List<String> pasos) {
 
         StringBuilder resultado = new StringBuilder();
 
@@ -21,20 +46,24 @@ public class Preprocesador {
 
             resultado.append(actual);
 
-            // Último carácter
-            if (i == expresion.length() - 1) {
+            if (i == expresion.length() - 1)
                 continue;
-            }
 
             char siguiente = expresion.charAt(i + 1);
 
-            // No insertar después del carácter de escape
-            if (actual == '\\') {
+            if (actual == '\\')
                 continue;
-            }
 
             if (debeConcatenar(actual, siguiente)) {
+
                 resultado.append('.');
+
+                pasos.add("Se inserta '.' entre '" +
+                        actual +
+                        "' y '" +
+                        siguiente +
+                        "'");
+
             }
 
         }
@@ -44,10 +73,11 @@ public class Preprocesador {
     }
 
     /**
-     * Determina si entre dos caracteres
-     * debe agregarse un operador de concatenación.
+     * Decide si entre dos símbolos
+     * debe agregarse una concatenación.
      */
-    private static boolean debeConcatenar(char actual, char siguiente) {
+    private static boolean debeConcatenar(char actual,
+                                          char siguiente) {
 
         boolean izquierda =
                 Operadores.esOperando(actual)
