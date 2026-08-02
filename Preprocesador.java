@@ -18,7 +18,10 @@ public class Preprocesador {
         pasos.add(expresion);
         pasos.add("");
 
-        String procesada = insertarConcatenacion(expresion, pasos);
+        String expandida = expandirOperadores(expresion, pasos);
+
+        String procesada =
+                insertarConcatenacion(expandida, pasos);
 
         pasos.add("");
         pasos.add("Expresión después del preprocesamiento:");
@@ -63,6 +66,79 @@ public class Preprocesador {
                         "' y '" +
                         siguiente +
                         "'");
+
+            }
+
+        }
+
+        return resultado.toString();
+
+    }
+
+    /**
+     * Convierte operadores extendidos.
+     *
+     * a+  -> aa*
+     * a?  -> (a|ε)
+     */
+    private static String expandirOperadores(String expresion,
+                                            List<String> pasos) {
+
+        StringBuilder resultado = new StringBuilder();
+
+        for (int i = 0; i < expresion.length(); i++) {
+
+            char actual = expresion.charAt(i);
+
+            // Operador +
+            if (actual == '+') {
+
+                if (resultado.length() > 0) {
+
+                    char anterior = resultado.charAt(resultado.length() - 1);
+
+                    resultado.append(anterior);
+                    resultado.append('*');
+
+                    pasos.add("Expansión '+' : "
+                            + anterior
+                            + "+"
+                            + " -> "
+                            + anterior
+                            + anterior
+                            + "*");
+
+                }
+
+            }
+
+            // Operador ?
+            else if (actual == '?') {
+
+                if (resultado.length() > 0) {
+
+                    char anterior = resultado.charAt(resultado.length() - 1);
+
+                    resultado.deleteCharAt(resultado.length() - 1);
+
+                    resultado.append("(");
+                    resultado.append(anterior);
+                    resultado.append("|ε)");
+
+                    pasos.add("Expansión '?' : "
+                            + anterior
+                            + "?"
+                            + " -> ("
+                            + anterior
+                            + "|ε)");
+
+                }
+
+            }
+
+            else {
+
+                resultado.append(actual);
 
             }
 

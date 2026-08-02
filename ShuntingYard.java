@@ -26,6 +26,30 @@ public class ShuntingYard {
             pasos.add("Leyendo: " + actual);
 
             //-------------------------------------------------
+            // CARÁCTER ESCAPADO
+            //-------------------------------------------------
+
+            if (actual == '\\') {
+
+                if (i + 1 < expresion.length()) {
+
+                    i++;
+
+                    char escapado = expresion.charAt(i);
+
+                    postfix.append(escapado);
+
+                    pasos.add("Carácter escapado: " + escapado);
+                    pasos.add("Se agrega directamente al postfix.");
+
+                    pasos.add("Pila: " + pila);
+                    pasos.add("Postfix: " + postfix);
+
+                }
+
+            }
+
+            //-------------------------------------------------
             // OPERANDO
             //-------------------------------------------------
 
