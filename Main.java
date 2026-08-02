@@ -4,53 +4,73 @@ public class Main {
 
     public static void main(String[] args) {
 
-        // Nombre del archivo que contiene las expresiones
-        String nombreArchivo = "expresiones.txt";
+        String archivo = "expresiones.txt";
 
-        // Leer todas las expresiones del archivo
-        List<String> expresiones = Archivo.leerArchivo(nombreArchivo);
+        // Leer todas las expresiones
+        List<String> expresiones = Archivo.leerArchivo(archivo);
 
-        int balanceadas = 0;
-        int noBalanceadas = 0;
-        int numeroExpresion = 1;
+        int numero = 1;
 
-        // Procesar cada expresión del archivo
         for (String expresion : expresiones) {
 
-            System.out.println("==================================================");
-            System.out.println("EXPRESIÓN #" + numeroExpresion);
-            System.out.println("Cadena: " + expresion);
-            System.out.println("==================================================");
+            System.out.println("\n=================================================");
+            System.out.println("EXPRESIÓN #" + numero);
+            System.out.println("=================================================");
 
-            // Llamar al balanceador
-            Resultado resultado = Balanceador.balancear(expresion);
+            //-----------------------------------------------------
+            // Expresión original
+            //-----------------------------------------------------
 
-            // Mostrar todos los pasos realizados
-            System.out.println("\nPasos realizados:");
+            System.out.println("Expresión original:");
+            System.out.println(expresion);
+
+            //-----------------------------------------------------
+            // PREPROCESAMIENTO
+            //-----------------------------------------------------
+
+            ResultadoPreprocesamiento preprocesamiento =
+                    Preprocesador.preprocesar(expresion);
+
+            System.out.println("\nPREPROCESAMIENTO");
+
+            for (String paso : preprocesamiento.getPasos()) {
+
+                System.out.println(paso);
+
+            }
+
+            //-----------------------------------------------------
+            // SHUNTING YARD
+            //-----------------------------------------------------
+
+            ResultadoPostfix resultado =
+                    ShuntingYard.convertir(
+                            preprocesamiento.getProcesada());
+
+            System.out.println("\nSHUNTING YARD");
 
             for (String paso : resultado.getPasos()) {
+
                 System.out.println(paso);
+
             }
 
-            // Mostrar el resultado final
-            if (resultado.isBalanceada()) {
-                System.out.println("\nResultado: EXPRESIÓN BALANCEADA");
-                balanceadas++;
-            } else {
-                System.out.println("\nResultado: EXPRESIÓN NO BALANCEADA");
-                noBalanceadas++;
-            }
+            //-----------------------------------------------------
+            // RESULTADO FINAL
+            //-----------------------------------------------------
 
-            System.out.println();
-            numeroExpresion++;
+            System.out.println("\nPOSTFIX FINAL");
+
+            System.out.println(resultado.getPostfix());
+
+            numero++;
+
         }
 
-        // Mostrar un resumen al finalizar
-        System.out.println("==================================================");
-        System.out.println("RESUMEN");
-        System.out.println("==================================================");
-        System.out.println("Total de expresiones: " + expresiones.size());
-        System.out.println("Balanceadas: " + balanceadas);
-        System.out.println("No balanceadas: " + noBalanceadas);
+        System.out.println("\n===============================================");
+        System.out.println("FIN DEL PROGRAMA");
+        System.out.println("===============================================");
+
     }
+
 }
