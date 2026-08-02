@@ -1,0 +1,77 @@
+getPrecedence(c):
+  precedence = calculate precedence over c
+  // Precedences for REs:
+  '(' -> 1
+  '|' -> 2
+  '.' -> 3
+  '?' -> 4
+  '*' -> 4
+  '+' -> 4
+  '^' -> 5
+  return precedence
+
+formatRegEx(regex):
+  allOperators = ['|', '?', '+', '*', '^']
+  binaryOperators = ['^', '|']
+
+  for (i in range 0 to regex.length):
+    c1 = regex.charAt(i)
+
+    if (i + 1 < regex.length()):
+      c2 = regex.charAt(i + 1)
+
+      concat c1 to res
+
+      if (
+        c1 != ( and
+        c2 != ) and
+        allOperators does not contain c2 and
+        binaryOperators does not contain c1
+      ):
+        concat '.' to res
+  end for
+
+  concatenate last char from regex to res 
+
+  return res 
+  
+infixToPostfix(regex):
+  postfix = string to store postfix expression
+  stack = a new empty stack
+  formattedRegEx = formatRegEx(regex)
+
+  for (c in formattedRegEx):
+    switch (c):
+      case '(':
+        stack.push(c)
+        break
+      
+      case ')':
+        while (stack.peek != '('):
+          concatenate stack.pop() to postfix
+        
+        // free the stack!
+        stack.pop()
+        break
+      
+      default case:
+        while (stack.size() > 0):
+          peekedChar = stack.peek()
+          peekedCharPrecedence = getPrecedence(peekedChar)
+          currentCharPrecedence = getPrecedence(c)
+
+          if (peekedCharPrecedence >= currentCharPrecedence):
+            concatenate stack.pop() to postfix
+          else:
+            break
+        end while
+
+        stack.push(c)
+        break
+  end for
+
+  while (stack.size() > 0):
+    concatenate stack.pop() to postfix
+  
+  return postfix
+  

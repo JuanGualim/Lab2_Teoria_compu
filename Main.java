@@ -1,76 +1,44 @@
 import java.util.List;
 
+/**
+ * Punto de entrada del programa.
+ *
+ * Esta clase solamente coordina el trabajo: lee el archivo, recorre sus
+ * expresiones y llama a ShuntingYard para realizar la conversión.
+ */
 public class Main {
 
     public static void main(String[] args) {
-
-        String archivo = "expresiones.txt";
-
-        List<String> expresiones =
-                Archivo.leerArchivo(archivo);
-
-        int contador = 1;
+        // Si se proporciona un nombre por consola se usa ese archivo.
+        // De lo contrario, se utiliza el archivo de ejemplo del proyecto.
+        String nombreArchivo = args.length > 0 ? args[0] : "expresiones.txt";
+        List<String> expresiones = Archivo.leerArchivo(nombreArchivo);
 
         for (String expresion : expresiones) {
-
-            System.out.println();
-            System.out.println("===========================================");
-            System.out.println("EXPRESIÓN " + contador);
-            System.out.println("===========================================");
-
-            System.out.println("Entrada:");
+            System.out.println("==================================");
+            System.out.println("Expresión:");
             System.out.println(expresion);
-
-            //-----------------------------------------
-            // TOKENIZACIÓN
-            //-----------------------------------------
-
-            List<Token> tokens =
-                    Tokenizador.tokenizar(expresion);
-
             System.out.println();
-            System.out.println("TOKENS");
 
-            for (Token t : tokens) {
+            // Antes de aplicar Shunting Yard hacemos explícita la
+            // concatenación que normalmente se omite en una expresión regular.
+            String expresionFormateada =
+                    ShuntingYard.insertarConcatenacion(expresion);
 
-                System.out.println(
-                        t.getValor()
-                        + " -> "
-                        + t.getTipo());
-
-            }
-
-            //-----------------------------------------
-            // SHUNTING YARD
-            //-----------------------------------------
-
-            ResultadoPostfix resultado =
-                    ShuntingYard.convertir(tokens);
-
+            System.out.println("Después de insertar concatenación:");
+            System.out.println(expresionFormateada);
             System.out.println();
-            System.out.println("PASOS");
-
-            for (String paso :
-                    resultado.getPasos()) {
-
-                System.out.println(paso);
-
-            }
-
-            //-----------------------------------------
-            // RESULTADO
-            //-----------------------------------------
-
+            System.out.println("Pasos:");
             System.out.println();
-            System.out.println("POSTFIX");
 
-            System.out.println(
-                    resultado.getPostfix());
+            // El método muestra el estado de la pila y del postfix en cada paso.
+            String postfix =
+                    ShuntingYard.convertirAPostfix(expresionFormateada);
 
-            contador++;
-
+            System.out.println("Postfix final:");
+            System.out.println();
+            System.out.println(postfix);
+            System.out.println();
         }
-
     }
-
 }

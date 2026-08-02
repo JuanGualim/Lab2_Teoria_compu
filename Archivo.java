@@ -4,41 +4,34 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Se encarga únicamente de leer las expresiones desde un archivo de texto.
+ */
 public class Archivo {
 
     /**
-     * Lee un archivo de texto y devuelve todas las líneas
-     * en una lista de expresiones.
+     * Lee una expresión por línea. Las líneas vacías se ignoran.
      *
-     * @param nombreArchivo Nombre del archivo a leer.
-     * @return Lista con todas las expresiones encontradas.
+     * @param nombreArchivo ruta del archivo que se desea leer
+     * @return lista con las expresiones encontradas
      */
     public static List<String> leerArchivo(String nombreArchivo) {
-
         List<String> expresiones = new ArrayList<>();
 
-        try (BufferedReader lector = new BufferedReader(new FileReader(nombreArchivo))) {
-
+        try (BufferedReader lector =
+                     new BufferedReader(new FileReader(nombreArchivo))) {
             String linea;
 
             while ((linea = lector.readLine()) != null) {
-
-                // Ignorar líneas vacías
                 if (!linea.trim().isEmpty()) {
                     expresiones.add(linea);
                 }
-
             }
-
         } catch (IOException e) {
-
-            System.out.println("Error al leer el archivo: " + nombreArchivo);
-            System.out.println(e.getMessage());
-
+            System.out.println("No se pudo leer el archivo: " + nombreArchivo);
+            System.out.println("Detalle: " + e.getMessage());
         }
 
         return expresiones;
-
     }
-
 }
