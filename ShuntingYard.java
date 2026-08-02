@@ -88,15 +88,34 @@ public class ShuntingYard {
                 pasos.add("Postfix: " + postfix);
 
             }
-
             //-------------------------------------------------
             // OPERADORES
             //-------------------------------------------------
 
-            else {
+            else if (Operadores.esOperador(actual)) {
 
-                pasos.add("Operador detectado.");
-                pasos.add("Pendiente de implementar.");
+                pasos.add("Operador: " + actual);
+
+                // Mientras exista un operador con mayor o igual prioridad
+                while (!pila.isEmpty()
+                        && pila.peek() != '('
+                        && Operadores.precedencia(pila.peek())
+                                >= Operadores.precedencia(actual)) {
+
+                    char operador = pila.pop();
+
+                    postfix.append(operador);
+
+                    pasos.add("Pop -> " + operador);
+                    pasos.add("Postfix: " + postfix);
+
+                }
+
+                pila.push(actual);
+
+                pasos.add("Push -> " + actual);
+                pasos.add("Pila: " + pila);
+                pasos.add("Postfix: " + postfix);
 
             }
 
