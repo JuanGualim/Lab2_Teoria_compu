@@ -4,165 +4,128 @@ import java.util.Stack;
 
 public class ShuntingYard {
 
-    public static ResultadoPostfix convertir(String expresion) {
+    public static ResultadoPostfix convertir(List<Token> tokens) {
 
-        Stack<Character> pila = new Stack<>();
-
-        StringBuilder postfix = new StringBuilder();
+        Stack<Token> pila = new Stack<>();
 
         List<String> pasos = new ArrayList<>();
 
-        pasos.add("=================================");
-        pasos.add("Inicio del algoritmo Shunting Yard");
-        pasos.add("Expresión: " + expresion);
-        pasos.add("=================================");
+        StringBuilder salida = new StringBuilder();
 
-        for (int i = 0; i < expresion.length(); i++) {
+        pasos.add("Inicio de Shunting Yard");
+        pasos.add("");
 
-            char actual = expresion.charAt(i);
+        for (Token token : tokens) {
 
-            pasos.add("");
-            pasos.add("---------------------------------");
-            pasos.add("Leyendo: " + actual);
+            pasos.add("-------------------------------------");
+            pasos.add("Token leído: " + token.getValor());
 
-            //-------------------------------------------------
-            // CARÁCTER ESCAPADO
-            //-------------------------------------------------
+            switch (token.getTipo()) {
 
-            if (actual == '\\') {
+                //-------------------------------------------------
+                // OPERANDO
+                //-------------------------------------------------
 
-                if (i + 1 < expresion.length()) {
+                case OPERANDO:
 
-                    i++;
+                    salida.append(token.getValor());
 
-                    char escapado = expresion.charAt(i);
+                    pasos.add("Operando -> pasa directamente a la salida.");
 
-                    postfix.append(escapado);
+                    break;
 
-                    pasos.add("Carácter escapado: " + escapado);
-                    pasos.add("Se agrega directamente al postfix.");
+                //-------------------------------------------------
+                // (
+                //-------------------------------------------------
 
-                    pasos.add("Pila: " + pila);
-                    pasos.add("Postfix: " + postfix);
+                case PARENTESIS_IZQUIERDO:
 
-                }
+                    pila.push(token);
 
-            }
+                    pasos.add("Push (");
 
-            //-------------------------------------------------
-            // OPERANDO
-            //-------------------------------------------------
+                    break;
 
-            if (Operadores.esOperando(actual)) {
+                //-------------------------------------------------
+                // )
+                //-------------------------------------------------
 
-                postfix.append(actual);
+                case PARENTESIS_DERECHO:
 
-                pasos.add("Es un operando.");
-                pasos.add("Se agrega directamente al postfix.");
+                    while (!pila.isEmpty()
+                            && pila.peek().getTipo()
+                            != TipoToken.PARENTESIS_IZQUIERDO) {
 
-                pasos.add("Pila: " + pila);
-                pasos.add("Postfix: " + postfix);
+                        salida.append(pila.pop().getValor());
 
-            }
+                    }
 
-            //-------------------------------------------------
-            // PARÉNTESIS (
-            //-------------------------------------------------
+                    if (!pila.isEmpty()) {
 
-            else if (actual == '(') {
+                        pila.pop();
 
-                pila.push(actual);
+                    }
 
-                pasos.add("Paréntesis de apertura.");
-                pasos.add("Push -> (");
+                    pasos.add("Se procesó ')'.");
 
-                pasos.add("Pila: " + pila);
-                pasos.add("Postfix: " + postfix);
+                    break;
 
-            }
+                //-------------------------------------------------
+                // OPERADOR
+                //-------------------------------------------------
 
-            //-------------------------------------------------
-            // PARÉNTESIS )
-            //-------------------------------------------------
+                case OPERADOR:
 
-            else if (actual == ')') {
+                    while (!pila.isEmpty()
 
-                pasos.add("Paréntesis de cierre.");
+                            && pila.peek().getTipo()
+                            == TipoToken.OPERADOR
 
-                while (!pila.isEmpty() && pila.peek() != '(') {
+                            && Operadores.precedencia(
+                                    pila.peek().getValor())
 
-                    char operador = pila.pop();
+                            >=
 
-                    postfix.append(operador);
+                            Operadores.precedencia(
+                                    token.getValor())) {
 
-                    pasos.add("Pop -> " + operador);
-                    pasos.add("Postfix: " + postfix);
+                        salida.append(
+                                pila.pop().getValor());
 
-                }
+                    }
 
-                if (!pila.isEmpty()) {
+                    pila.push(token);
 
-                    pila.pop();
+                    pasos.add("Push operador "
+                            + token.getValor());
 
-                    pasos.add("Se elimina '(' de la pila.");
-
-                }
-
-                pasos.add("Pila: " + pila);
-                pasos.add("Postfix: " + postfix);
+                    break;
 
             }
-            //-------------------------------------------------
-            // OPERADORES
-            //-------------------------------------------------
 
-            else if (Operadores.esOperador(actual)) {
+            pasos.add("Pila: " + pila);
 
-                pasos.add("Operador: " + actual);
-
-                // Mientras exista un operador con mayor o igual prioridad
-                while (!pila.isEmpty()
-                        && pila.peek() != '('
-                        && Operadores.precedencia(pila.peek())
-                                >= Operadores.precedencia(actual)) {
-
-                    char operador = pila.pop();
-
-                    postfix.append(operador);
-
-                    pasos.add("Pop -> " + operador);
-                    pasos.add("Postfix: " + postfix);
-
-                }
-
-                pila.push(actual);
-
-                pasos.add("Push -> " + actual);
-                pasos.add("Pila: " + pila);
-                pasos.add("Postfix: " + postfix);
-
-            }
+            pasos.add("Salida: " + salida);
 
         }
 
-        pasos.add("");
-        pasos.add("---------------------------------");
-        pasos.add("Fin de la expresión.");
+        //-----------------------------------------------------
 
         while (!pila.isEmpty()) {
 
-            char operador = pila.pop();
-
-            postfix.append(operador);
-
-            pasos.add("Pop final -> " + operador);
+            salida.append(
+                    pila.pop().getValor());
 
         }
 
-        pasos.add("Postfix final: " + postfix);
+        pasos.add("-------------------------------------");
+        pasos.add("Fin del algoritmo");
+
+        pasos.add("Postfix final: "
+                + salida);
 
         return new ResultadoPostfix(
-                postfix.toString(),
+                salida.toString(),
                 pasos
         );
 

@@ -1,0 +1,11 @@
+public enum TipoToken {
+
+    OPERANDO,
+
+    OPERADOR,
+
+    PARENTESIS_IZQUIERDO,
+
+    PARENTESIS_DERECHO
+
+}

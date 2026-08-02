@@ -6,70 +6,70 @@ public class Main {
 
         String archivo = "expresiones.txt";
 
-        // Leer todas las expresiones
-        List<String> expresiones = Archivo.leerArchivo(archivo);
+        List<String> expresiones =
+                Archivo.leerArchivo(archivo);
 
-        int numero = 1;
+        int contador = 1;
 
         for (String expresion : expresiones) {
 
-            System.out.println("\n=================================================");
-            System.out.println("EXPRESIÓN #" + numero);
-            System.out.println("=================================================");
+            System.out.println();
+            System.out.println("===========================================");
+            System.out.println("EXPRESIÓN " + contador);
+            System.out.println("===========================================");
 
-            //-----------------------------------------------------
-            // Expresión original
-            //-----------------------------------------------------
-
-            System.out.println("Expresión original:");
+            System.out.println("Entrada:");
             System.out.println(expresion);
 
-            //-----------------------------------------------------
-            // PREPROCESAMIENTO
-            //-----------------------------------------------------
+            //-----------------------------------------
+            // TOKENIZACIÓN
+            //-----------------------------------------
 
-            ResultadoPreprocesamiento preprocesamiento =
-                    Preprocesador.preprocesar(expresion);
+            List<Token> tokens =
+                    Tokenizador.tokenizar(expresion);
 
-            System.out.println("\nPREPROCESAMIENTO");
+            System.out.println();
+            System.out.println("TOKENS");
 
-            for (String paso : preprocesamiento.getPasos()) {
+            for (Token t : tokens) {
 
-                System.out.println(paso);
+                System.out.println(
+                        t.getValor()
+                        + " -> "
+                        + t.getTipo());
 
             }
 
-            //-----------------------------------------------------
+            //-----------------------------------------
             // SHUNTING YARD
-            //-----------------------------------------------------
+            //-----------------------------------------
 
             ResultadoPostfix resultado =
-                    ShuntingYard.convertir(
-                            preprocesamiento.getProcesada());
+                    ShuntingYard.convertir(tokens);
 
-            System.out.println("\nSHUNTING YARD");
+            System.out.println();
+            System.out.println("PASOS");
 
-            for (String paso : resultado.getPasos()) {
+            for (String paso :
+                    resultado.getPasos()) {
 
                 System.out.println(paso);
 
             }
 
-            //-----------------------------------------------------
-            // RESULTADO FINAL
-            //-----------------------------------------------------
+            //-----------------------------------------
+            // RESULTADO
+            //-----------------------------------------
 
-            System.out.println("\nPOSTFIX FINAL");
+            System.out.println();
+            System.out.println("POSTFIX");
 
-            System.out.println(resultado.getPostfix());
+            System.out.println(
+                    resultado.getPostfix());
 
-            numero++;
+            contador++;
 
         }
-
-        System.out.println("\n===============================================");
-        System.out.println("FIN DEL PROGRAMA");
-        System.out.println("===============================================");
 
     }
 
