@@ -56,6 +56,15 @@ public class ShuntingYard {
      * @return expresión equivalente en formato postfix
      */
     public static String convertirAPostfix(String expresion) {
+        return convertirAPostfix(expresion, true);
+    }
+
+    /**
+     * Convierte a postfix y permite elegir si se muestra la traza detallada.
+     * El método anterior se conserva para no romper el laboratorio previo.
+     */
+    public static String convertirAPostfix(String expresion,
+                                            boolean mostrarPasos) {
         Stack<Character> pila = new Stack<>();
         StringBuilder postfix = new StringBuilder();
         int posicion = 0;
@@ -81,9 +90,12 @@ public class ShuntingYard {
                     }
 
                     // Los paréntesis no forman parte de la salida postfix.
-                    if (!pila.isEmpty()) {
-                        pila.pop();
+                    if (pila.isEmpty()) {
+                        throw new IllegalArgumentException(
+                                "Paréntesis de cierre sin apertura.");
                     }
+
+                    pila.pop();
                 } else if (esOperador(caracter)) {
                     // Antes de apilar el operador actual, pasan a la salida los
                     // operadores de igual o mayor precedencia.
@@ -101,18 +113,20 @@ public class ShuntingYard {
                 }
             }
 
-            mostrarPaso(simbolo, pila, postfix);
+            if (mostrarPasos) {
+                mostrarPaso(simbolo, pila, postfix);
+            }
         }
 
         // Al terminar la lectura, los operadores pendientes pasan al postfix.
         while (!pila.isEmpty()) {
             char caracter = pila.pop();
 
-            // Esta condición evita copiar un '(' si la entrada estuviera mal
-            // balanceada. No se realiza validación sintáctica completa.
-            if (caracter != '(') {
-                postfix.append(caracter);
+            if (caracter == '(') {
+                throw new IllegalArgumentException(
+                        "Paréntesis de apertura sin cierre.");
             }
+            postfix.append(caracter);
         }
 
         return postfix.toString();
