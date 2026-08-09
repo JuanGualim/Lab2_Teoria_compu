@@ -85,17 +85,7 @@ javac *.java
 java Main
 ```
 
-También se puede indicar otro archivo:
-
-```bash
-java Main otro_archivo.txt
-```
-
-En un entorno sin interfaz gráfica se mantiene disponible el árbol textual en
-la consola y se omite la ventana Swing.
 
 ## Video
 
-VIDEO:
-
-[PEGAR AQUÍ EL LINK]
+VIDEO: https://youtu.be/fga5GMPrHn8 
