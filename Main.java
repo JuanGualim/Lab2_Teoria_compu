@@ -1,6 +1,9 @@
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
 
-/** Coordina la lectura, conversión, construcción y visualización del árbol. */
+/** Coordina desde la lectura de la expresión hasta la simulación del AFN. */
 public class Main {
 
     public static void main(String[] args) {
@@ -12,14 +15,14 @@ public class Main {
             return;
         }
 
-        int numero = 1;
-        for (String expresion : expresiones) {
-            procesarExpresion(expresion, numero);
-            numero++;
+        Scanner entrada = new Scanner(System.in);
+        for (int i = 0; i < expresiones.size(); i++) {
+            procesarExpresion(expresiones.get(i), i + 1, entrada);
         }
     }
 
-    private static void procesarExpresion(String expresion, int numero) {
+    private static void procesarExpresion(String expresion, int numero,
+                                           Scanner entrada) {
         System.out.println("==========================================");
         System.out.println("EXPRESIÓN " + numero);
         System.out.println("==========================================");
@@ -52,9 +55,58 @@ public class Main {
             System.out.println(ArbolSintactico.comoTexto(raiz));
 
             VisualizadorArbol.mostrar(raiz, "Expresión " + numero);
+
+            Thompson thompson = new Thompson();
+            AFN afn = thompson.construir(raiz);
+
+            System.out.println("CONSTRUCCIÓN DEL AFN:");
+            System.out.println("Algoritmo de Thompson aplicado correctamente.");
+            System.out.println();
+            System.out.println("ESTADOS:");
+            System.out.println(ordenarEstados(afn.getEstados()));
+            System.out.println();
+            System.out.println("ESTADO INICIAL:");
+            System.out.println(afn.getEstadoInicial());
+            System.out.println();
+            System.out.println("ESTADO DE ACEPTACIÓN:");
+            System.out.println(afn.getEstadoAceptacion());
+            System.out.println();
+            System.out.println("TRANSICIONES:");
+            System.out.println();
+            System.out.print(afn);
+            System.out.println();
+
+            VisualizadorAFN.mostrar(afn, "Expresión " + numero);
+
+            System.out.println("Ingrese una cadena w para probar:");
+            String cadena = entrada.hasNextLine() ? entrada.nextLine() : "";
+            System.out.println(cadena.isEmpty() ? "w = ε" : "w = " + cadena);
+            System.out.println();
+            System.out.println("Simulando...");
+
+            SimuladorAFN simulador = new SimuladorAFN();
+            boolean aceptada = simulador.simular(afn, cadena);
+            System.out.println();
+            System.out.println("Estados finales alcanzados:");
+            System.out.println(ordenarEstados(simulador.getEstadosFinales()));
+            System.out.println();
+            System.out.println("¿w pertenece a L(r)?");
+            System.out.println();
+            System.out.println(aceptada ? "si" : "no");
+            System.out.println();
         } catch (IllegalArgumentException e) {
             System.out.println("No se pudo procesar la expresión: "
                     + e.getMessage());
         }
+    }
+
+    /** Ordena únicamente para que la salida q0, q1, q2... sea fácil de leer. */
+    private static List<Estado> ordenarEstados(Iterable<Estado> estados) {
+        List<Estado> ordenados = new ArrayList<>();
+        for (Estado estado : estados) {
+            ordenados.add(estado);
+        }
+        ordenados.sort(Comparator.comparingInt(Estado::getId));
+        return ordenados;
     }
 }

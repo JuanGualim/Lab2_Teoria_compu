@@ -1,11 +1,11 @@
-# Laboratorio de Teoría de la Computación - Árbol sintáctico
+# Laboratorio de Teoría de la Computación - Thompson y AFN
 
 ## Objetivo
 
-El programa lee expresiones regulares en formato infix, las convierte a
-postfix con el algoritmo de Shunting Yard y construye un árbol sintáctico para
-cada una. El árbol se imprime en la consola y también se dibuja en una ventana
-de Java Swing.
+El programa lee expresiones regulares en formato infix, reutiliza Shunting Yard
+y el árbol sintáctico del laboratorio anterior, aplica el algoritmo de
+Thompson, muestra el AFN resultante y simula una cadena `w` para decidir si
+pertenece al lenguaje de la expresión.
 
 ## Funcionamiento general
 
@@ -20,7 +20,13 @@ expresión postfix
        ↓
 árbol sintáctico con una pila
        ↓
-representación textual y gráfica
+algoritmo de Thompson
+       ↓
+AFN con transiciones epsilon
+       ↓
+visualización y simulación
+       ↓
+si / no
 ```
 
 La concatenación implícita se hace explícita con el operador `.`. Por ejemplo,
@@ -33,7 +39,10 @@ La precedencia utilizada es:
 3. `|` (menor precedencia)
 
 Los operadores `+` (uno o más) y `?` (cero o uno) se mantienen como nodos
-unarios. No se expanden, para conservar sencilla la construcción del árbol.
+unarios. Thompson los procesa directamente, sin modificar ni duplicar el árbol:
+
+- `R+` obliga a recorrer `R` una vez y después permite regresar a su inicio.
+- `R?` permite recorrer `R` o saltarlo mediante una transición `ε`.
 
 ## Estructura del proyecto
 
@@ -43,6 +52,12 @@ unarios. No se expanden, para conservar sencilla la construcción del árbol.
 - `Nodo.java`: representa un nodo del árbol.
 - `ArbolSintactico.java`: construye el árbol desde postfix con `Stack<Nodo>`.
 - `VisualizadorArbol.java`: dibuja el árbol con Java Swing.
+- `Estado.java`: representa un estado `q0`, `q1`, etc.
+- `Transicion.java`: guarda origen, destino y símbolo.
+- `AFN.java`: almacena los estados y transiciones de un AFN.
+- `Thompson.java`: recorre el árbol y construye el AFN recursivamente.
+- `SimuladorAFN.java`: calcula cierres epsilon y simula una cadena.
+- `VisualizadorAFN.java`: dibuja estados, flechas y etiquetas con Swing.
 - `expresiones.txt`: contiene las expresiones que se procesarán.
 
 ## Conversión con Shunting Yard
@@ -61,6 +76,17 @@ Se recorre el postfix de izquierda a derecha:
   izquierdo, crea el operador padre y lo coloca en la pila.
 
 Al terminar debe quedar exactamente un nodo en la pila: la raíz del árbol.
+
+## Construcción y simulación del AFN
+
+Thompson crea fragmentos pequeños para operandos, concatenación, unión,
+cerradura de Kleene, cerradura positiva y operador opcional. Cada expresión
+reinicia la numeración de sus estados en `q0`.
+
+La simulación comienza con el cierre epsilon del estado inicial. Para cada
+símbolo de `w`, sigue las transiciones coincidentes y vuelve a calcular el
+cierre epsilon. La cadena es aceptada si al terminar se alcanza el estado de
+aceptación.
 
 ## Expresiones utilizadas
 
@@ -91,11 +117,21 @@ También se puede indicar otro archivo:
 java Main otro_archivo.txt
 ```
 
-En un entorno sin interfaz gráfica se mantiene disponible el árbol textual en
-la consola y se omite la ventana Swing.
+Después de construir cada AFN, el programa muestra:
+
+```text
+Ingrese una cadena w para probar:
+```
+
+Se escribe la cadena y se presiona Enter. Para probar la cadena vacía solamente
+se presiona Enter; las transiciones `ε` no consumen ningún carácter.
+
+Java Swing se utiliza para visualizar tanto el árbol como el AFN. En un entorno
+sin interfaz gráfica se mantienen disponibles todas las representaciones de
+consola y solamente se omiten las ventanas.
 
 ## Video
 
 VIDEO:
 
-[PEGAR AQUÍ EL LINK]
+[PEGAR AQUÍ EL LINK DE YOUTUBE]
