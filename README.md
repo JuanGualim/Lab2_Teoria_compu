@@ -132,6 +132,4 @@ consola y solamente se omiten las ventanas.
 
 ## Video
 
-VIDEO:
-
-[PEGAR AQUÍ EL LINK DE YOUTUBE]
+VIDEO: https://youtu.be/UkO3AJwDAuk 
